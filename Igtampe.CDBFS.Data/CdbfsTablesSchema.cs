@@ -23,7 +23,7 @@ namespace Igtampe.CDBFS.Data {
                 => @$"
                     CREATE TABLE {Name} (
                         {string.Join(',', Columns.Select(A => $"{A.Name} {A.GetDataType(Engine)}"))}
-                        PRIMARY KEY ({string.Join(',',PrimaryKeys)})
+                        ,PRIMARY KEY ({string.Join(',',PrimaryKeys)})
                     )
                 ";
         }
