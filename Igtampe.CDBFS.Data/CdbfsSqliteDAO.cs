@@ -149,10 +149,22 @@ namespace Igtampe.CDBFS.Data {
             return R.GetInt32(0) != 0;
 
         }
+        public async Task RenameFile(string Filename, string NewFilename) {
+            if (!await FileExists(Filename)) { throw new FileNotFoundException($"File {Filename} was not found on this CDBFS and cannot be updated"); }
+
+            using var C = Conn.CreateCommand();
+            C.CommandText = "Update Files set Name = @NewName where Name = @Name";
+
+            C.Parameters.Add("@Name", DbType.String).Value = Filename;
+            C.Parameters.Add("@NewName", DbType.String).Value = NewFilename;
+
+            await C.ExecuteNonQueryAsync();
+        }
 
         public async ValueTask DisposeAsync() {
             GC.SuppressFinalize(this);
             await Conn.DisposeAsync();
         }
+
     }
 }

@@ -20,6 +20,8 @@ namespace Igtampe.CDBFS.Data {
 
         public Task DeleteFile(string Filename);
 
+        public Task RenameFile(string Filename, string NewFilename);
+
         public Task<bool> FileExists(string Filename);
 
     }

@@ -41,6 +41,31 @@ namespace Igtampe.CDBFS.Tests {
         }
 
         [Test]
+        public async Task RenamedFileExists() {
+            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
+            await D.Open();
+
+            const string Filename = "I1";
+            const string NewFilename = "I2";
+
+            Assert.That(await D.FileExists(Filename), Is.False);
+            Assert.That(await D.FileExists(NewFilename), Is.False);
+
+            //Add the file
+            await D.CreateFile(Filename, Properties.Resources.I1);
+
+            Assert.That(await D.FileExists(Filename), Is.True);
+            Assert.That(await D.FileExists(NewFilename), Is.False);
+
+            await D.RenameFile(Filename, NewFilename);
+
+            Assert.That(await D.FileExists(Filename), Is.False);
+            Assert.That(await D.FileExists(NewFilename), Is.True);
+
+            await D.DisposeAsync();
+        }
+
+        [Test]
         public async Task CreatedFileMatchesContent() {
             ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
             await D.Open();
