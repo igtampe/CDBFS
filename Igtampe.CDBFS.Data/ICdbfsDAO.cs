@@ -1,28 +1,33 @@
 ﻿using Igtampe.CDBFS.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Igtampe.CDBFS.Data {
     public interface ICdbfsDAO : IAsyncDisposable {
 
         public Task Open();
 
-        public Task<List<CdbfsFile>> GetFiles();
+        public Task<List<CdbfsFile>> GetFiles(string Path = "/");
 
-        public Task<byte[]> GetFile(string Filename);
+        public Task<byte[]> GetFile(string Path);
 
-        public Task CreateFile(string Filename, byte[] Data);
+        public Task CreateFile(string Path, byte[] Data);
 
-        public Task UpdateFile(string Filename, byte[] Data);
+        public Task UpdateFile(string Path, byte[] Data);
 
-        public Task DeleteFile(string Filename);
+        public Task DeleteFile(string Path);
 
-        public Task RenameFile(string Filename, string NewFilename);
+        public Task RenameFile(string Path, string NewFilename);
 
-        public Task<bool> FileExists(string Filename);
+        public Task<bool> FileExists(string Path);
+        public Task<bool> FolderExists(string Path);
+        public Task<bool> Exists(string Path);
+
+        public Task MoveFile(string Path, string NewPath);
+        public Task MoveFolder(string Path, string NewPath);
+
+        public Task CreateFolder(string Path);
+        public Task DeleteFolder(string Path);
+
+        public Task RenameFolder(string Path, string NewFolderName);
+
 
     }
 }
