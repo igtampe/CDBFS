@@ -6,26 +6,17 @@ namespace Igtampe.CDBFS.Tests {
 
         const string DbFile = "cdbfs1.sqlite";
 
+        ICdbfsDAO D;
+
         [SetUp]
         public async Task Setup() {
             if (File.Exists(DbFile)) { File.Delete(DbFile); }
-            var D = await CdbfsSqliteDAO.CreateCdbfsSqliteFile(DbFile);
-            await D.DisposeAsync();
-        }
-
-        [Test]
-        public async Task OpeningWorks() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
+            D = await CdbfsSqliteDAO.CreateCdbfsSqliteFile(DbFile);
             await D.Open();
-
-            await D.DisposeAsync();
         }
 
         [Test]
         public async Task CreatedFileExists() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
-            await D.Open();
-
             const string Filename = "I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
@@ -36,15 +27,10 @@ namespace Igtampe.CDBFS.Tests {
             Assert.That(await D.FileExists(Filename), Is.True);
             Assert.That((await D.GetFiles()), Has.Count.EqualTo(1));
             Assert.That((await D.GetFiles())[0].Name, Is.EqualTo(Filename));
-
-            await D.DisposeAsync();
         }
 
         [Test]
         public async Task RenamedFileExists() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
-            await D.Open();
-
             const string Filename = "I1";
             const string NewFilename = "I2";
 
@@ -61,15 +47,10 @@ namespace Igtampe.CDBFS.Tests {
 
             Assert.That(await D.FileExists(Filename), Is.False);
             Assert.That(await D.FileExists(NewFilename), Is.True);
-
-            await D.DisposeAsync();
         }
 
         [Test]
         public async Task CreatedFileMatchesContent() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
-            await D.Open();
-
             const string Filename = "I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
@@ -79,15 +60,10 @@ namespace Igtampe.CDBFS.Tests {
             var Data = await D.GetFile(Filename);
 
             Assert.That(Enumerable.SequenceEqual(Data, Properties.Resources.I1), Is.True);
-            
-            await D.DisposeAsync();
         }
 
         [Test]
         public async Task UpdatedFileMatchesContent() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
-            await D.Open();
-
             const string Filename = "I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
@@ -104,14 +80,10 @@ namespace Igtampe.CDBFS.Tests {
 
             Assert.That(Enumerable.SequenceEqual(Data2, Properties.Resources.I2), Is.True);
 
-            await D.DisposeAsync();
         }
 
         [Test]
         public async Task DeletedFileDoesNotExist() {
-            ICdbfsDAO D = new CdbfsSqliteDAO(DbFile);
-            await D.Open();
-
             const string Filename = "I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
@@ -124,12 +96,11 @@ namespace Igtampe.CDBFS.Tests {
             await D.DeleteFile(Filename);
 
             Assert.That(await D.FileExists(Filename), Is.False);
-
-            await D.DisposeAsync();
         }
 
         [TearDown]
-        public void Teardown() {
+        public async Task Teardown() {
+            await D.DisposeAsync();
             if (File.Exists(DbFile)) { File.Delete(DbFile); }
         }
     }
