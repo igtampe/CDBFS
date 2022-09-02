@@ -16,7 +16,7 @@ namespace Igtampe.CDBFS.Tests {
 
         [Test]
         public async Task CreatedFileExists() {
-            const string Filename = "I1";
+            const string Filename = "/I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
 
@@ -24,14 +24,15 @@ namespace Igtampe.CDBFS.Tests {
             await D.CreateFile(Filename, Properties.Resources.I1);
 
             Assert.That(await D.FileExists(Filename), Is.True);
-            Assert.That((await D.GetFiles()), Has.Count.EqualTo(1));
-            Assert.That((await D.GetFiles())[0].Name, Is.EqualTo(Filename));
+            Assert.That((await D.GetFiles()).Files, Has.Count.EqualTo(1));
+            Assert.That('/'+(await D.GetFiles()).Files[0].Name, Is.EqualTo(Filename));
         }
 
         [Test]
         public async Task RenamedFileExists() {
-            const string Filename = "I1";
-            const string NewFilename = "I2";
+            const string Filename = "/I1";
+            const string NewFilename = "/I2";
+            const string NewFilenameName = "I2";
 
             Assert.That(await D.FileExists(Filename), Is.False);
             Assert.That(await D.FileExists(NewFilename), Is.False);
@@ -42,7 +43,7 @@ namespace Igtampe.CDBFS.Tests {
             Assert.That(await D.FileExists(Filename), Is.True);
             Assert.That(await D.FileExists(NewFilename), Is.False);
 
-            await D.RenameFile(Filename, NewFilename);
+            await D.RenameFile(Filename, NewFilenameName);
 
             Assert.That(await D.FileExists(Filename), Is.False);
             Assert.That(await D.FileExists(NewFilename), Is.True);
@@ -50,7 +51,7 @@ namespace Igtampe.CDBFS.Tests {
 
         [Test]
         public async Task CreatedFileMatchesContent() {
-            const string Filename = "I1";
+            const string Filename = "/I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
 
@@ -63,7 +64,7 @@ namespace Igtampe.CDBFS.Tests {
 
         [Test]
         public async Task UpdatedFileMatchesContent() {
-            const string Filename = "I1";
+            const string Filename = "/I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
 
@@ -83,7 +84,7 @@ namespace Igtampe.CDBFS.Tests {
 
         [Test]
         public async Task DeletedFileDoesNotExist() {
-            const string Filename = "I1";
+            const string Filename = "/I1";
 
             Assert.That(await D.FileExists(Filename), Is.False);
 
