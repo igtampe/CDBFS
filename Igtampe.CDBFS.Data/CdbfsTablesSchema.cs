@@ -13,6 +13,7 @@ namespace Igtampe.CDBFS.Data {
 
             public string Name { get; set; }
             public List<Column> Columns { get; set; } = new();
+            public List<string> PrimaryKeys => Columns.Where(A=>A.IsPrimaryKey).Select(A=>A.Name).ToList();
 
             public Table(string Name, List<Column> Columns) { 
                 this.Name = Name; this.Columns = Columns; 
@@ -21,8 +22,8 @@ namespace Igtampe.CDBFS.Data {
             public string ToSQLiteTableCreationScript(DbEngine Engine)
                 => @$"
                     CREATE TABLE {Name} (
-                        {string.Join(',', Columns.Select(A => $"{A.Name} {A.GetDataType(Engine)}" +
-                                       $"{(A.IsPrimaryKey ? " PRIMARY KEY" : "")}"))}
+                        {string.Join(',', Columns.Select(A => $"{A.Name} {A.GetDataType(Engine)}"))}
+                        PRIMARY KEY ({string.Join(',',PrimaryKeys)})
                     )
                 ";
         }
@@ -51,10 +52,12 @@ namespace Igtampe.CDBFS.Data {
 
         public static readonly List<Table> Tables = new() {
             new("Files", new(){
-                new("Name","TEXT","TEXT", true),
+                new("Name","TEXT","TEXT",true),
+                new("Path","TEXT","TEXT",true),
                 new("DateCreated","DATETIME","TIMESTAMP"),
                 new("DateUpdated","DATETIME","TIMESTAMP"),
-                new("Data","BLOB","BYTEA")
+                new("IsFolder","BOOLEAN","BOOLEAN"),
+                new("Data","BLOB","BYTEA"),  
             })
         };
     }
