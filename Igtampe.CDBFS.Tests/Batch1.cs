@@ -1,4 +1,3 @@
-using Igtampe.CDBFS.Common;
 using Igtampe.CDBFS.Data;
 
 namespace Igtampe.CDBFS.Tests {
