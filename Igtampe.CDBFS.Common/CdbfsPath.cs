@@ -14,7 +14,7 @@
             }
 
             return new() {
-                ItemPath = Path[..LastSlash], //Anything before the index of is the folder path
+                ItemPath = string.IsNullOrWhiteSpace(Path[..LastSlash]) ? "/" : Path[..LastSlash], //Anything before the index of is the folder path
                 ItemName = Path[(LastSlash+1)..] //Anything after it is the filename
             };
         }
