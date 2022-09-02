@@ -4,7 +4,7 @@ namespace Igtampe.CDBFS.Data {
 
         public Task Open();
 
-        public Task<List<CdbfsFile>> GetFiles(string Path = "/");
+        public Task<CdbfsFolder> GetFiles(string Path = "/");
 
         public Task<byte[]> GetFile(string Path);
 
