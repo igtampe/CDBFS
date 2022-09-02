@@ -4,8 +4,8 @@
 
         public string Path { get; set; } = "";
 
-        public List<string> Subfolders { get; set; } = new();
+        public List<CdbfsFile> Subfolders { get; set; } = new();
 
-        public List<string> Files { get; set; } = new();
+        public List<CdbfsFile> Files { get; set; } = new();
     }
 }
