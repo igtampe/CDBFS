@@ -13,10 +13,7 @@ namespace Igtampe.CDBFS.CLI {
 
             await D.CreateFile("Dingus.txt", File.ReadAllBytes("A:/Dingus.txt"));
             await D.CreateFile("ChopoNoPauses.png", File.ReadAllBytes("A:/ChopoNoPauses.png"));
-
-            foreach (CdbfsFile F in await D.GetFiles()) {
-                Console.WriteLine($"{F.Name} : {F.DateCreated} : {F.DateUpdated}");
-            }
+                        
         }
     }
 }
