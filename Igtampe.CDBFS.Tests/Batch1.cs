@@ -6,7 +6,7 @@ namespace Igtampe.CDBFS.Tests {
 
         const string DbFile = "cdbfs1.sqlite";
 
-        ICdbfsDAO D;
+        CdbfsSqliteContext D;
 
         [SetUp]
         public void Setup() {
@@ -56,7 +56,7 @@ namespace Igtampe.CDBFS.Tests {
 
             //Add the file and immediately retrieve it
             await D.CreateFile(Filename, Properties.Resources.I1);
-            var Data = await D.GetFile(Filename);
+            var Data = await D.GetFileData(Filename);
 
             Assert.That(Enumerable.SequenceEqual(Data, Properties.Resources.I1), Is.True);
         }
@@ -69,13 +69,13 @@ namespace Igtampe.CDBFS.Tests {
 
             //Add the file and immediately retrieve it
             await D.CreateFile(Filename, Properties.Resources.I1);
-            var Data1 = await D.GetFile(Filename);
+            var Data1 = await D.GetFileData(Filename);
             
             //Ensure data saved correctly once
             Assert.That(Enumerable.SequenceEqual(Data1, Properties.Resources.I1), Is.True);
 
             await D.UpdateFile(Filename, Properties.Resources.I2);
-            var Data2 = await D.GetFile(Filename);
+            var Data2 = await D.GetFileData(Filename);
 
             Assert.That(Enumerable.SequenceEqual(Data2, Properties.Resources.I2), Is.True);
 
