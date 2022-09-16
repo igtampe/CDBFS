@@ -28,15 +28,26 @@ namespace Igtampe.CDBFS.Data {
         protected DbSet<CdbfsFileData> CdbfsFileData { get; set; }
 
 
-        public async Task<List<CdbfsFile>> GetFiles(string Path = "/") => await CdbfsFile.Where(a=> a.FolderPath == Path).ToListAsync();
+        public async Task<List<CdbfsItem>> GetItems(string Path = "/") => await GetAt(CdbfsItem,Path);
+        public async Task<List<CdbfsFile>> GetFiles(string Path = "/") => await GetAt(CdbfsFile, Path);
+        public async Task<List<CdbfsFolder>> GetFolders(string Path = "/") => await GetAt(CdbfsFolder, Path);
+
+        private static async Task<List<E>> GetAt<E>(IQueryable<E> Collection, string Path) where E : CdbfsItem {
+            if (!Path.EndsWith('/')) { Path += "/"; }
+            return await Collection.Where(A => A.FolderPath == Path).ToListAsync();
+        }
 
         public async Task<byte[]> GetFileData(string Path) => (await GetFile(new(Path), true)).Data;
-        public async Task CreateFile(string Filename, byte[] Data) {
+        
+        public async Task CreateFile(string Path, byte[] Data) {
 
-            if (await FileExists(Filename)) { throw new InvalidOperationException("File Already Exists!"); }
+            if (await FileExists(Path)) { throw new InvalidOperationException("File Already Exists!"); }
+
+            var P = new CdbfsPath(Path);
 
             var F = new CdbfsFile() {
-                Name = Filename,
+                Name = P.ItemName,
+                FolderPath = P.ItemPath,
                 Data = Data,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow
@@ -57,7 +68,7 @@ namespace Igtampe.CDBFS.Data {
 
         public async Task DeleteFile(string Path) {
             var F = await GetFile(new(Path),true);
-            Remove(F.DataHolder);
+            Remove(F.DataHolder!);
             Remove(F);
             await SaveChangesAsync();
         }
