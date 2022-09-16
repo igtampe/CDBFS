@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Igtampe.CDBFS.Common {
 
@@ -18,6 +19,7 @@ namespace Igtampe.CDBFS.Common {
         public bool IsLoaded => DataHolder != null;
 
         /// <summary>Data of this file</summary>
+        [JsonIgnore]
         public byte[] Data {
             get => DataHolder?.Data ?? Array.Empty<byte>(); 
             set {
@@ -28,6 +30,7 @@ namespace Igtampe.CDBFS.Common {
 
         /// <summary>Data holder of this file</summary>
         [ForeignKey("CdbfsFileData")]
+        [JsonIgnore]
         public CdbfsFileData? DataHolder { get; set; } = null;
 
     }
