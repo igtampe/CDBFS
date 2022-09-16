@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Igtampe.CDBFS.Data {
-    public class CdbfsSqliteContext : DbContext, ICdbfsDAO {
+    public class CdbfsSqliteContext : DbContext {
 
         public CdbfsSqliteContext(string Path) 
             : base(new DbContextOptionsBuilder<CdbfsSqliteContext>().UseSqlite($"Data Source={Path};Pooling=False;").Options) 
@@ -19,16 +19,18 @@ namespace Igtampe.CDBFS.Data {
             foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()) { entityType.SetTableName(entityType.DisplayName()); }
         }
 
+        public DbSet<CdbfsItem> CdbfsItem { get; set; }
+
         public DbSet<CdbfsFile> CdbfsFile { get; set; }
 
-        private DbSet<CdbfsFileData> CdbfsFileData { get; set; }
+        public DbSet<CdbfsFolder> CdbfsFolder { get; set; }
 
-        public Task Open() => throw new NotImplementedException("This isn't openable");
+        protected DbSet<CdbfsFileData> CdbfsFileData { get; set; }
 
-        public async Task<List<CdbfsFile>> GetFiles() => await CdbfsFile.ToListAsync();
 
-        public async Task<byte[]> GetFile(string Filename) => (await GetFileObject(Filename, true)).Data;
+        public async Task<List<CdbfsFile>> GetFiles(string Path = "/") => await CdbfsFile.Where(a=> a.FolderPath == Path).ToListAsync();
 
+        public async Task<byte[]> GetFileData(string Path) => (await GetFile(new(Path), true)).Data;
         public async Task CreateFile(string Filename, byte[] Data) {
 
             if (await FileExists(Filename)) { throw new InvalidOperationException("File Already Exists!"); }
@@ -40,29 +42,29 @@ namespace Igtampe.CDBFS.Data {
                 DateUpdated = DateTime.UtcNow
             };
 
-            CdbfsFile.Add(F);
+            Add(F);
             await SaveChangesAsync();
         }
 
-        public async Task UpdateFile(string Filename, byte[] Data) {
-            var F = await GetFileObject(Filename);
+        public async Task UpdateFile(string Path, byte[] Data) {
+            var F = await GetFile(new(Path));
             F.Data = Data;
             F.DateUpdated = DateTime.UtcNow;
             
-            CdbfsFile.Update(F);
+            Update(F);
             await SaveChangesAsync();
         }
 
-        public async Task DeleteFile(string Filename) {
-            var F = await GetFileObject(Filename,true);
+        public async Task DeleteFile(string Path) {
+            var F = await GetFile(new(Path),true);
             Remove(F.DataHolder);
             Remove(F);
             await SaveChangesAsync();
         }
 
-        public async Task RenameFile(string Filename, string NewFilename) {
+        public async Task RenameFile(string Path, string NewFilename) {
             if (await FileExists(NewFilename)) { throw new InvalidOperationException("A file with that name already exists!"); }
-            var F = await GetFileObject(Filename);
+            var F = await GetFile(new(Path));
             F.Name = NewFilename;
             
             CdbfsFile.Update(F);
@@ -71,12 +73,12 @@ namespace Igtampe.CDBFS.Data {
 
         public async Task<bool> FileExists(string Filename) => await CdbfsFile.AnyAsync(A => A.Name == Filename);
 
-        private async Task<CdbfsFile> GetFileObject(string Filename, bool LoadData = false) {
+        private async Task<CdbfsFile> GetFile(CdbfsPath Path, bool LoadData = false) {
 
             IQueryable<CdbfsFile> C = CdbfsFile;
             if (LoadData) { C = C.Include(A => A.DataHolder); }
 
-            var F = await C.FirstOrDefaultAsync(A => A.Name == Filename);
+            var F = await C.FirstOrDefaultAsync(A => A.Name == Path.ItemName && A.FolderPath==Path.ItemPath);
             return F is null ? throw new FileNotFoundException("File was not found!") : F;
 
         }
