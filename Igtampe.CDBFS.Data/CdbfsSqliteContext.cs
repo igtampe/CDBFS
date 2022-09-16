@@ -19,8 +19,9 @@ namespace Igtampe.CDBFS.Data {
             foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()) { entityType.SetTableName(entityType.DisplayName()); }
         }
 
-
         public DbSet<CdbfsFile> CdbfsFile { get; set; }
+
+        private DbSet<CdbfsFileData> CdbfsFileData { get; set; }
 
         public Task Open() => throw new NotImplementedException("This isn't openable");
 
@@ -29,6 +30,9 @@ namespace Igtampe.CDBFS.Data {
         public async Task<byte[]> GetFile(string Filename) => (await GetFileObject(Filename, true)).Data;
 
         public async Task CreateFile(string Filename, byte[] Data) {
+
+            if (await FileExists(Filename)) { throw new InvalidOperationException("File Already Exists!"); }
+
             var F = new CdbfsFile() {
                 Name = Filename,
                 Data = Data,
@@ -50,8 +54,9 @@ namespace Igtampe.CDBFS.Data {
         }
 
         public async Task DeleteFile(string Filename) {
-            var F = await GetFileObject(Filename);
-            CdbfsFile.Remove(F);
+            var F = await GetFileObject(Filename,true);
+            Remove(F.DataHolder);
+            Remove(F);
             await SaveChangesAsync();
         }
 
