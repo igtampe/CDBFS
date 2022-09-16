@@ -1,3 +1,0 @@
-﻿namespace Igtampe.CDBFS.Common {
-   
-}

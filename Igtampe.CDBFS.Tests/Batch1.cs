@@ -1,5 +1,5 @@
-using Igtampe.CDBFS.Common;
 using Igtampe.CDBFS.Data;
+using System.Data.SqlClient;
 
 namespace Igtampe.CDBFS.Tests {
     public class Tests {
@@ -9,10 +9,9 @@ namespace Igtampe.CDBFS.Tests {
         ICdbfsDAO D;
 
         [SetUp]
-        public async Task Setup() {
+        public void Setup() {
             if (File.Exists(DbFile)) { File.Delete(DbFile); }
-            D = await CdbfsSqliteDAO.CreateCdbfsSqliteFile(DbFile);
-            await D.Open();
+            D = new CdbfsSqliteContext(DbFile);
         }
 
         [Test]
